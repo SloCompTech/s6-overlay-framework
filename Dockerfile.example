@@ -1,0 +1,52 @@
+#
+#	Base image
+#	@see https://hub.docker.com/_/alpine
+#	@see https://hub.docker.com/_/python
+#	@see https://hub.docker.com/_/ubuntu/
+#
+ARG FROM_IMAGE
+FROM ${FROM_IMAGE}
+
+#
+#	Arguments
+#
+ARG ARCH='amd64'
+ARG BUILD_DATE
+ARG CONTAINER_GROUP
+ARG CONTAINER_USER
+ARG VCS_REF
+ARG VCS_SRC
+ARG VERSION
+
+#
+#	Environment variables
+#	@see https://www.cyberciti.biz/tips/howto-linux-unix-bash-shell-setup-prompt.html
+#	@see https://unix.stackexchange.com/questions/43945/whats-the-difference-between-various-term-variables
+#	@see https://unix.stackexchange.com/questions/34379/is-home-but-sometimes
+# @see https://www.cyberciti.biz/faq/bash-shell-change-the-color-of-my-shell-prompt-under-linux-or-unix/
+#
+ENV ARCH="${ARCH}" \
+	CONTAINER_GROUP="${CONTAINER_GROUP:-abc}" \
+	CONTAINER_USER="${CONTAINER_USER:-abc}" \
+	DOCKER_CONTAINER=true \
+	HOME="/root" \
+	OVERLAY_VERSION="${OVERLAY_VERSION}" \
+	PS1="\[\e]0;\u@\h: \w\a\]\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ " \
+	TERM="xterm" \
+	VISUAL="nano"
+
+#
+#	Install framework
+#
+#ADD https://github.com/SloCompTech/docker-baseimage/raw/master/setup.sh /tmp/setup.sh
+COPY setup.sh /tmp
+RUN  chmod +x  /tmp/setup.sh && \
+  /tmp/setup.sh && \
+	rm /tmp/setup.sh
+
+#
+#	Add local files to image
+#
+COPY root/ /
+
+ENTRYPOINT ["/init"]
