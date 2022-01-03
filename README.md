@@ -57,11 +57,11 @@ Create `run` file in `/etc/services.d/myapp` as explained [here](https://github.
 
 Example service script:
 
-˙˙˙ bash
+``` bash
 #!/usr/bin/with-contenv sh
 
 exec s6-setuidgid $CONTAINER_USER myservice
-˙˙˙
+```
 
 Note: Make sure `run` file is executable.
 
