@@ -85,7 +85,7 @@ echo 'Directory structure created'
 #
 echo "Setting up non-root user ${CONTAINER_USER}"
 set +e
-id -u $CONTAINER_USER 2>/dev/null
+id -u $CONTAINER_USER &>/dev/null
 if [ $? -eq 1 ]; then
   set -e
   # User doesn't exists, create new one
@@ -139,9 +139,9 @@ echo 's6overlay installed'
 # @see https://github.com/SloCompTech/s6-overlay-framework
 # 
 echo 'Installing framework scripts...'
-#curl -o /tmp/repo.zip https://codeload.github.com/SloCompTech/s6-overlay-framework/zip/refs/heads/master # TODO: Add script version
-#unzip /tmp/repo.zip 'docker-baseimage-master/root/*' -d /
-#rm /tmp/repo.zip
+curl -o /tmp/repo.zip https://codeload.github.com/SloCompTech/s6-overlay-framework/zip/refs/heads/master # TODO: Add script version
+unzip /tmp/repo.zip 's6-overlay-framework-master/root/*' -d /
+rm /tmp/repo.zip
 echo 'Framework scripts installed'
 
 echo 'Docker image framework setup done'
