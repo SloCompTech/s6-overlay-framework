@@ -28,7 +28,7 @@ Image has prepared directories:
 
 |**Parameter**|**Function**|
 |:-----------:|:-----------|
-|`-e CONTAINER_GROUP='abc'`|Set non-root user group name in container|
+|`-e CONTAINER_GROUP='abc'`|Set non-root user group name in container (already set in example Dockerfile)|
 |`-e CONTAINER_USER='abc'`|Set non-root user used in container (already set in example Dockerfile)|
 |`-e NO_DEFAULT_CONFIG=true`|Skip setting up default config|
 |`-e PUID=1000`|for UserID - see below for explanation|
@@ -42,9 +42,24 @@ Image has prepared directories:
 |**Variable name**|**Function**|
 |:---------------:|:----------:|
 |`CONTAINER_USER`|User used to run in less priviledged mode (owner of prepared directories).|
-|`CONTAINER_VARS_FILE`|File where base image container variables are stored, load it with `source $CONTAINER_VARS_FILE` at the **top** of your scripts (**\*** - variables that depend on this)|
 |`DOCKER_CONTAINER`|Always `true`|
-|`RUNCMD`|Put it before every bash command to make sure command is run as container user (generates `sudo -u PID -g GID -E` command) **\***|
+
+## Non-root user
+
+By default script generates non-root user **abc** and group **abc**. If base image already has user created (eg. node image has node user), then set *CONTAINER_GROUP* and *CONTAINER_USER* so new user won't be created, but existing will be used.
+
+To run programs as non-root user use [s6-overlay](https://github.com/just-containers/s6-overlay#dropping-privileges) or [gosu](https://github.com/tianon/gosu).
+## Creating service
+
+Create `run` file in `/etc/services.d/myapp` as explained [here](https://github.com/just-containers/s6-overlay#writing-a-service-script).
+
+Example service script:
+
+˙˙˙ bash
+#!/usr/bin/with-contenv sh
+
+exec s6-setuidgid $CONTAINER_USER myservice
+˙˙˙
 
 ## Building locally
 
@@ -63,6 +78,7 @@ Submit issue [here](https://github.com/SloCompTech/s6-overlay-framework/issues).
 ## Documentation
 
 - [Base image from LSIO](https://github.com/linuxserver/docker-baseimage-alpine/blob/master/Dockerfile.aarch64)
+- [Gosu](https://github.com/tianon/gosu)
 - [s6-overlay](https://github.com/just-containers/s6-overlay)
 
 ## Versions
