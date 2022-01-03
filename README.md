@@ -1,16 +1,18 @@
 # Docker image s6overlay
 
-This is **base image** with [s6 overlay (supervisor utils)](https://github.com/just-containers/s6-overlay) already setup. Directory structure is also setup.
+This is **template** with [s6 overlay (supervisor utils)](https://github.com/just-containers/s6-overlay) and framework already setup.
+
+Simply start with `Dockerfile.example`.
 
 ## Project structure
 
 ```
 root # Files copied to image started from root
   etc
-    cont-finish.d # See s6-overlay
-    cont-init.d # See s6-overlay
+    cont-finish.d # Finish scripts: See s6-overlay
+    cont-init.d # Init scripts: See s6-overlay
     fix-attrs.d # See s6-overlay
-    service.d # See s6-overlay
+    service.d # Service scripts: See s6-overlay
 Dockerfile # Image configuration
 ```
 
@@ -60,6 +62,8 @@ Example service script:
 
 exec s6-setuidgid $CONTAINER_USER myservice
 ˙˙˙
+
+Note: Make sure `run` file is executable.
 
 ## Building locally
 
