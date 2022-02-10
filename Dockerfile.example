@@ -34,7 +34,7 @@ ENV ARCH="${ARCH}" \
 #
 ADD https://raw.githubusercontent.com/SloCompTech/s6-overlay-framework/master/setup.sh /tmp/setup.sh
 #COPY setup.sh /tmp/setup.sh # For development
-RUN chmod +x  /tmp/setup.sh && \
+RUN chmod +x /tmp/setup.sh && \
   /tmp/setup.sh && \
 	rm /tmp/setup.sh
 

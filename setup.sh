@@ -35,9 +35,11 @@ if [ -n "$(which apk)" ]; then
   echo 'Installing packages using apk'
   apk add --no-cache \
     bash \
+    bind-tools \
     ca-certificates \
     coreutils \
     curl \
+    iputils \
     nano \
     shadow \
     sudo \
@@ -53,6 +55,8 @@ else
     ca-certificates \
     coreutils \
     curl \
+    dnsutils \
+    iputils-ping \
     nano \
     sudo \
     tar \
