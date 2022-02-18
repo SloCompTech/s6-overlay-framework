@@ -89,27 +89,56 @@ echo 'Directory structure created'
 #
 echo "Setting up non-root user ${CONTAINER_USER}"
 set +e
-id -u $CONTAINER_USER &>/dev/null
-if [ $? -eq 1 ]; then
-  set -e
+getent passwd $CONTAINER_USER &>/dev/null
+user_exists=$?
+set -e
+if [ $user_exists -ne 0 ]; then
   # User doesn't exists, create new one
-  echo "Creating non-root user with name ${CONTAINER_USER}"
-  if [ -n "$(id $CONTAINER_USER_UID)" ]; then
-    echo "UID $CONTAINER_USER_UID already exists"
+  echo "Non-root user with name ${CONTAINER_USER} doesn't exists yet, setting up"
+
+  # Create user group if it doesn't exists
+  set +e
+  getent group $CONTAINER_GROUP &>/dev/null
+  group_exists=$?
+  set -e
+  if [ $group_exists -ne 0 ]; then
+    echo "Group ${CONTAINER_GROUP} doesn't exists yet, setting up"
+    set +e
+    getent group $CONTAINER_GROUP_GID &>/dev/null
+    group_exists=$?
+    set -e
+    if [ $group_exists -eq 0 ]; then
+      echo "Can't create user group, GID already taken"
+      exit 1
+    fi
+
+    # Create group
+    echo "Creating group ${CONTAINER_GROUP}"
+    groupadd \
+      --gid=$CONTAINER_GROUP_GID \
+      $CONTAINER_GROUP
+  fi
+
+  set +e
+  getent passwd $CONTAINER_USER_UID &>/dev/null
+  user_exists=$?
+  set -e
+  if [ $user_exists -eq 0 ]; then
+    echo "UID ${CONTAINER_USER_UID} already exists"
     exit 1
   fi
-  groupadd \
-    --gid=$CONTAINER_GROUP_GID \
-    $CONTAINER_GROUP
+  
+  echo "Creating user ${CONTAINER_USER}"
   useradd \
     --gid=$CONTAINER_GROUP_GID \
     --home-dir=/config \
     --no-log-init \
+    --no-user-group \
     --shell=/bin/false \
-    -u 1000 -U -s /bin/false $CONTAINER_USER
+    --uid=$CONTAINER_USER_UID \
+    $CONTAINER_USER
   echo "User ${CONTAINER_USER} created"
 else
-  set -e
   # User already exists, leave it alone
   echo "User ${CONTAINER_USER} already exists"
 fi
@@ -144,7 +173,10 @@ echo 's6overlay installed'
 # 
 echo 'Installing framework scripts...'
 curl -o /tmp/repo.zip https://codeload.github.com/SloCompTech/s6-overlay-framework/zip/refs/heads/master # TODO: Add script version
-unzip /tmp/repo.zip 's6-overlay-framework-master/root/*' -d /
+tmp_dir="$(mktemp -d)"
+unzip /tmp/repo.zip -d $tmp_dir
+cp -r $tmp_dir/s6-overlay-framework-master/root/* /
+rm -r $tmp_dir
 rm /tmp/repo.zip
 echo 'Framework scripts installed'
 
